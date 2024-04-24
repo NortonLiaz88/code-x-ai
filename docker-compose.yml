@@ -1,0 +1,11 @@
+version: '3'
+services:
+  my-app:
+    build: 
+      context: .
+    container_name: codex-ai-app
+    volumes:
+      - .:/app
+    ports:
+      - "8000:80"
+    restart: always
