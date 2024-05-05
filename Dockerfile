@@ -1,31 +1,17 @@
-# syntax=docker/dockerfile:1.0.0-experimental
-FROM tiangolo/uvicorn-gunicorn:python3.11
+# 
+FROM python:3.9
 
-# Put first so anytime this file changes other cached layers are invalidated.
-COPY gpt4all_api/requirements.txt /requirements.txt
+# 
+WORKDIR /code
 
-RUN pip install --upgrade pip
+# 
+COPY ./requirements.txt /code/requirements.txt
 
-# Run various pip install commands with ssh keys from host machine.
-RUN --mount=type=ssh pip install -r /requirements.txt && \
-  rm -Rf /root/.cache && rm -Rf /tmp/pip-install*
+# 
+RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
-# Finally, copy app and client.
-COPY gpt4all_api/app /app
+# 
+COPY ./app /code/app
 
-RUN mkdir -p /models
-
-
-
-# Install Python dependencies
-COPY requirements.txt /app/
-RUN pip install --no-cache-dir --upgrade -r requirements.txt
-
-# Set environment variable to prevent virtualenv creation
-ENV POETRY_VIRTUALENVS_CREATE=false
-
-# Copy the application source code to the container
-COPY . /app/
-
-# Run Uvicorn server when the container launches
+# 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
